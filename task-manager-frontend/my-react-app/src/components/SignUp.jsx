@@ -47,38 +47,68 @@ function SignUp({ onSignUp }) {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen">
-      <form className="bg-white p-6 rounded shadow-md w-80" onSubmit={handleSubmit}>
-        <h2 className="text-xl font-bold mb-4 text-center">Sign Up</h2>
-        {message && <p className="mb-2 text-center text-red-500">{message}</p>}
+    <div className="flex items-center justify-center h-screen bg-gray-100">
+      <form
+        className="bg-white p-8 rounded-xl shadow-lg w-96 max-w-sm"
+        onSubmit={handleSubmit}
+      >
+        <h2 className="text-2xl font-semibold text-center text-blue-600 mb-6">
+          Sign Up
+        </h2>
 
-        <input
-          className="border p-2 w-full mb-3 rounded"
-          name="username"
-          placeholder="Username"
-          onChange={handleChange}
-        />
+        {message && <p className="mb-4 text-center text-red-500">{message}</p>}
 
-        <input
-          className="border p-2 w-full mb-1 rounded"
-          name="email"
-          type="email"
-          placeholder="Email"
-          onChange={handleChange}
-        />
-        {emailError && <p className="text-sm text-red-500 mb-2">{emailError}</p>}
+        <div className="mb-4">
+          <input
+            className="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            name="username"
+            placeholder="Username"
+            value={form.username}
+            onChange={handleChange}
+            required
+          />
+        </div>
 
-        <input
-          className="border p-2 w-full mb-3 rounded"
-          type="password"
-          name="password"
-          placeholder="Password"
-          onChange={handleChange}
-        />
+        <div className="mb-4">
+          <input
+            className="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            name="email"
+            type="email"
+            placeholder="Email"
+            value={form.email}
+            onChange={handleChange}
+            required
+          />
+          {emailError && <p className="text-sm text-red-500 mt-1">{emailError}</p>}
+        </div>
 
-        <button type="submit" className="bg-green-600 text-white p-2 rounded w-full">
+        <div className="mb-6">
+          <input
+            className="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={form.password}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <button
+          type="submit"
+          className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-300"
+        >
           Sign Up
         </button>
+
+        <div className="flex justify-center mt-4">
+          <span className="text-sm text-gray-500">
+            Already have an account?{" "}
+            <a href="/signin" className="text-blue-600 hover:underline">
+              Sign In
+            </a>
+          </span>
+        </div>
       </form>
     </div>
   );

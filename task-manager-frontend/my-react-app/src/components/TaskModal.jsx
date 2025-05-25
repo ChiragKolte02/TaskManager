@@ -62,6 +62,7 @@ function TaskModal({ onClose, onSuccess }) {
         }
   
         console.log("Subscription saved to backend successfully.");
+        window.location.reload()
       } catch (error) {
         console.error("❌ Error in push setup:", error);
       }
@@ -97,13 +98,11 @@ function TaskModal({ onClose, onSuccess }) {
       })
       .then((data) => {
         onSuccess(data);
-        // window.location.reload();
         onClose();
       })
       .catch((error) => {
         console.error("Error creating task:", error);
       }).finally(
-        // window.location.reload()
       );
 
       setupPush(form.title, form.time_date, form.completed)

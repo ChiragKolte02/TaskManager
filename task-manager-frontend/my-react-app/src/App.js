@@ -1,74 +1,104 @@
 // App.js
 import React, { useEffect, useState } from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom"; 
 import Navbar from "./components/Navbar";
-import TaskCard from "./components/TaskCard";
-import TaskModal from "./components/TaskModal";
 import Footer from "./components/Footer";
 import SignIn from "./components/SignIn";
 import SignUp from "./components/SignUp";
+import AboutUs from "./components/AboutUs"; 
+import HomePage from "./components/HomePage";  
+import UserDashboard from "./components/UserDashboard";  
 import './index.css';
-import askForNotificationPermission from "./askForNotificationPermission";
 
 function App() {
 
-  const [showModal, setShowModal] = useState(false);
-  const [tasks, setTasks] = useState([]);
+  // const [tasks, setTasks] = useState([]);
   const [loggedIn, setLoggedIn] = useState(!!localStorage.getItem("access"));
   const [showSignUp, setShowSignUp] = useState(false);
 
-  const addTaskToList = (newTask) => {
-    setTasks([...tasks, newTask]);
-  };
+  // const addTaskToList = (newTask) => {
+  //   setTasks([...tasks, newTask]);
+  // };
+  let alarm;
+
+  
 
   useEffect(() => {
-    // askForNotificationPermission()
-  }, [])
+    // Define message handler
+    const handleMessage = (event) => {
+      console.log("✅ Message from Service Worker:", event.data);
+      const words =  event.data.trim().split(" ");  // split by space
+      const lastWord = words.pop();   
+      console.log(`last word is ${lastWord}`)
+      try {
+        if(lastWord === "High"){
+        const alarm = new Audio('/alarm-clock-90867.mp3'); 
+        alarm.play().then(() => {
+          console.log("🔊 Alarm is playing...");
+        }).catch(err => {
+          console.error("❌ Failed to play alarm:", err);
+        });
+      }
+      if(lastWord === "Medium"){
+        const alarm = new Audio('/alarm-clock-beep-105903.mp3'); 
+        alarm.play().then(() => {
+          console.log("🔊 Alarm is playing...");
+        }).catch(err => {
+          console.error("❌ Failed to play alarm:", err);
+        });
+      }
 
+        // alert(event.data);
+      } catch (err) {
+        console.error("❌ Error creating Audio object:", err);
+      }
+    };
+
+    // Attach the event listener
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.ready.then(() => {
+        navigator.serviceWorker.addEventListener('message', handleMessage);
+      });
+    }
+
+    // Cleanup
+    return () => {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.ready.then(() => {
+          navigator.serviceWorker.removeEventListener('message', handleMessage);
+        });
+      }
+    };
+  }, []);
 
   return (
-    <>
-    {loggedIn ? (<div>
-      <Navbar />
-      <div className="flex flex-col items-center p-6 bg-gray-50 min-h-screen">
-        <div className="flex gap-6 flex-wrap justify-start max-w-6xl">
-          <TaskCard />
-          <button
-            className="text-4xl text-blue-600 border-2 border-blue-500 rounded-full p-2 hover:bg-blue-100 transition"
-            onClick={() => setShowModal(true)}
-          >
-            +
-          </button>
-        </div>
-      </div>
-      {showModal && (
-        <TaskModal
-          onClose={() => setShowModal(false)}
-          onSuccess={addTaskToList}
-        />
-      )}
-      </div>)
-    : (<div>
-      <Navbar />
-    {showSignUp ? (
-    <SignUp onSignUp={() => setShowSignUp(false)} />
-  ) : (
-    <div>
-      <SignIn onLogin={() => setLoggedIn(true)} />
-      <p className="text-center mt-4">
-        Don't have an account?{" "}
-        <button
-          className="text-blue-500 underline"
-          onClick={() => setShowSignUp(true)}
-        >
-          Sign Up
-        </button>
-      </p>
-    </div>
-  )}</div>)}
-      <Footer />
-    </>
-  );
+    <Router>
+      <div>
+        <Navbar loggedIn={loggedIn} /> {/* Pass loggedIn state to Navbar */}
+        <Routes>
+          <Route path="/about" element={<AboutUs />} />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/signin" element={<SignIn onLogin={() => setLoggedIn(true)} />} />
+          <Route path="/signup" element={<SignUp onSignUp={() => setShowSignUp(false)} />} />
+          
+          {/* User Dashboard Route */}
+          <Route
+            path="/user-dashboard"
+            element={
+              loggedIn ? (
+                <UserDashboard />
+              ) : (
+                <SignIn onLogin={() => setLoggedIn(true)} />
+              )
+            }
+          />
 
+          {/* Other routes */}
+        </Routes>
+        <Footer />
+      </div>
+    </Router>
+  );
 }
 
 export default App;

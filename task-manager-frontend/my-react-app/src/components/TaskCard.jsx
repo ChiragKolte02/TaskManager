@@ -5,8 +5,6 @@ function TaskCard() {
   const [editingTask, setEditingTask] = useState(null);
   const [show, setShow] = useState(false);
 
-  // const token = localStorage.getItem("accessToken");
-
   useEffect(() => {
     const token = localStorage.getItem("access");
 
@@ -46,12 +44,11 @@ function TaskCard() {
         return response.json();
       })
       .then((updatedTask) => {
-        // After updating the task, update the subscription
-        const username = localStorage.getItem("username"); // Assuming you stored username in localStorage
+        const username = localStorage.getItem("username");
         const oldTitle = encodeURIComponent(localStorage.getItem("oldTask"));
         const newTitle = encodeURIComponent(updatedTask.title);
         const newTimeDate = encodeURIComponent(updatedTask.time_date);
-  
+
         fetch(`http://127.0.0.1:8000/update-subscription/${username}/${oldTitle}/${newTitle}/${newTimeDate}/`)
           .then((response) => {
             if (!response.ok) {
@@ -65,7 +62,7 @@ function TaskCard() {
           .catch((error) => {
             console.error("Error updating subscription:", error);
           });
-  
+
         const updatedTasks = tasks.map((task) =>
           task.id === updatedTask.id ? updatedTask : task
         );
@@ -76,8 +73,6 @@ function TaskCard() {
       .catch((error) => {
         console.error("Error updating task:", error);
       });
-      
-      
   }
 
   function handleUpdate(id) {
@@ -120,10 +115,8 @@ function TaskCard() {
         if (!response.ok) {
           throw new Error("Delete failed");
         }
-        const username = localStorage.getItem("username")
-        // Remove the task from state
+        const username = localStorage.getItem("username");
         if (username && title) {
-          console.log(username, title)
           fetch(`http://127.0.0.1:8000/delete-subscription/${username}/${encodeURIComponent(title)}/`, {
             method: "GET",
           })
@@ -146,86 +139,90 @@ function TaskCard() {
   }
 
   return (
-    <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 px-4">
-      {tasks.map((task) => (
-        // !task.completed &&
-        <div
-          className={`shadow-md border rounded-lg mr-8 p-4 w-60 mb-4 ${
-            task.completed
-              ? "bg-gray-100 border-gray-300"
-              : "bg-white border-gray-200"
-          }`}
-          key={task.id}
-        >
-          <h3
-            className={`font-bold border-b pb-1 mb-2 ${
-              task.completed ? "text-gray-500 line-through" : "text-blue-600"
-            }`}
-          >
-            {task.title}
-          </h3>
-          <p
-            className={`text-gray-700 mb-1 ${
-              task.completed ? "line-through text-gray-500" : ""
-            }`}
-          >
-            <strong>Description:</strong> {task.description}
-          </p>
-          <p className="text-gray-700 mb-1">
-            <strong>Time:</strong> {task.time_date}
-          </p>
-          <p className="text-gray-700 mb-3">
-            <strong>Completed:</strong> {task.completed ? "Yes ✅" : "No ❌"}
-          </p>
-
-          <button
-            className="bg-yellow-400 hover:bg-yellow-500 text-white w-full p-2 rounded mb-2"
-            onClick={() => handleUpdate(task.id)}
-          >
-            Update
-          </button>
-          <button
-            className={`${
-              task.completed
-                ? "bg-blue-500 hover:bg-blue-600"
-                : "bg-green-500 hover:bg-green-600"
-            } text-white w-full p-2 rounded mb-2`}
-            onClick={() => toggleCompletion(task)}
-          >
-            {task.completed ? "Mark as Incomplete" : "Mark as Complete"}
-          </button>
-          <button
-            className="bg-red-500 hover:bg-red-600 text-white w-full p-2 rounded"
-            onClick={() => handleDelete(task.id, task.title, task.user)}
-          >
-            Delete
-          </button>
+    <div className="px-6 py-4">
+      {tasks.length === 0 ? (
+        <div className="flex flex-col items-center justify-center h-[60vh] text-center">
+          <h2 className="text-3xl font-bold text-blue-600 mb-4">🚀 Welcome {localStorage.getItem("username")}, to Task Master!</h2>
+          <p className="text-gray-600 text-lg">Let's get productive. Add your first task and conquer the day! 💪</p>
         </div>
-      ))}
+      ) : (
+        <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {tasks.map((task) => (
+            <div
+              className={`shadow-lg border rounded-xl p-5 transition-transform transform hover:scale-105 ${
+                task.completed
+                  ? "bg-gray-100 border-gray-300"
+                  : "bg-white border-gray-200"
+              }`}
+              key={task.id}
+            >
+              <h3
+                className={`font-bold text-lg mb-2 ${
+                  task.completed ? "text-gray-500 line-through" : "text-blue-700"
+                }`}
+              >
+                {task.title}
+              </h3>
+              <p className={`text-gray-600 mb-2 ${task.completed ? "line-through" : ""}`}>
+                <strong>Description:</strong> {task.description}
+              </p>
+              <p className="text-gray-600 mb-2">
+                <strong>Time:</strong> {task.time_date}
+              </p>
+              <p className="text-gray-600 mb-4">
+                <strong>Completed:</strong> {task.completed ? "Yes ✅" : "No ❌"}
+              </p>
 
+              <button
+                className="bg-yellow-400 hover:bg-yellow-500 text-white w-full p-2 rounded-md mb-2 transition"
+                onClick={() => handleUpdate(task.id)}
+              >
+                Update
+              </button>
+              <button
+                className={`${
+                  task.completed
+                    ? "bg-blue-500 hover:bg-blue-600"
+                    : "bg-green-500 hover:bg-green-600"
+                } text-white w-full p-2 rounded-md mb-2 transition`}
+                onClick={() => toggleCompletion(task)}
+              >
+                {task.completed ? "Mark as Incomplete" : "Mark as Complete"}
+              </button>
+              <button
+                className="bg-red-500 hover:bg-red-600 text-white w-full p-2 rounded-md transition"
+                onClick={() => handleDelete(task.id, task.title)}
+              >
+                Delete
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Edit Modal */}
       {show && editingTask && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded shadow-md w-80">
-            <h2 className="text-xl font-semibold mb-4">Edit Task</h2>
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-xl w-96">
+            <h2 className="text-2xl font-semibold text-blue-600 mb-4">Edit Task</h2>
             <input
-              className="border p-2 w-full mb-2"
+              className="border p-3 w-full rounded-md mb-3"
               value={editingTask.title}
               onChange={(e) =>
                 setEditingTask({ ...editingTask, title: e.target.value })
               }
+              placeholder="Task Title"
             />
             <textarea
-              className="border p-2 w-full mb-2"
+              className="border p-3 w-full rounded-md mb-3"
               value={editingTask.description}
               onChange={(e) =>
-                setEditingTask({
-                  ...editingTask,
-                  description: e.target.value,
-                })
+                setEditingTask({ ...editingTask, description: e.target.value })
               }
+              placeholder="Task Description"
             />
             <input
-              className="border p-2 w-full mb-4"
+              className="border p-3 w-full rounded-md mb-4"
               type="datetime-local"
               value={editingTask.time_date}
               onChange={(e) =>
@@ -233,13 +230,13 @@ function TaskCard() {
               }
             />
             <button
-              className="bg-green-500 text-white w-full p-2 rounded mb-2"
+              className="bg-green-500 hover:bg-green-600 text-white w-full p-3 rounded-md mb-2 transition"
               onClick={handleSaveUpdate}
             >
               Save Changes
             </button>
             <button
-              className="bg-gray-500 text-white w-full p-2 rounded"
+              className="bg-gray-500 hover:bg-gray-600 text-white w-full p-3 rounded-md transition"
               onClick={() => setShow(false)}
             >
               Cancel

@@ -53,4 +53,3 @@ class MyCronJob(CronJobBase):
             if current_time_ist == task_time:
                 notify_users_test(task_title, username, task_importance)
                 print(f"[CRON] Checked and sent notifications for tasks at {current_time_ist}")
-    # Call the cron job function
